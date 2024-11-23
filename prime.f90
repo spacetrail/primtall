@@ -6,52 +6,49 @@ program primtall_kalkulator
     integer :: antall_primtall
     real :: rest 
     logical :: primtall = .true.
+    logical :: stop = .false.
     integer, allocatable :: array_prim(:)
     allocate(array_prim(0));
     
     print *, "Hvor mange primtall vil du ha: "
-    read *, antall_primtall ! Lese antall primtall
-
-    sum_up = 2 ! Starter på 2 og jobber oppover.
-    do
+    !read *, antall_primtall ! Lese antall primtall
+    antall_primtall = 10
+    !$OMP PARALLEL DO PRIVATE(sum_down, sum_up)
+    !sum_up = 2 ! Starter på 2 og jobber oppover.
+    do sum_up = 2, 10
         sum_down = sum_up
-        primtall = .true.
-        do
-            ! Vi kom oss ned til 1, kan ikke dele mer.
-            if(sum_down < 2) then
-                ! Fant et primtall
-                if(primtall) then
-                    antall_elementer = antall_elementer + 1
-                    print *, "Fant primtall: ", sum_up
-                    call legg_til_array(array_prim, sum_up)
-                    exit
-                end if
-            end if
-            ! Hopp over å dele med seg selv
-            if(sum_up <= sum_down) then
-                sum_down = sum_down - 1
-                cycle
-            end if
-            rest = mod(sum_up, sum_down) ! Finne rest
-            ! Betyr det er delelig med et tall, dermed ikke primtall.
-            if(rest == 0.0) then
+        !primtall = .true.
+        print *, "sum_up: ", sum_up
+        do while (sum_down > 1)
+            if (sum_up /= sum_down .and. mod(sum_up, sum_down) == 0) then
+                print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, "ikke er et primtall"
                 primtall = .false.
                 exit
-            ! vet ikke, funker uten
-            !else 
-            !    primtall = .true.
+            else
+                print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, " er et primtall"
+                 
             end if
-            sum_down = sum_down - 1 ! Tell nedover, 10/10, 10/9, 10/8 osv.
+            sum_down = sum_down - 1
+            print *, "Tråd", omp_get_thread_num(), "jobber med sum_down=", sum_down
         end do
-        if(size(array_prim) >= antall_primtall) then 
-            print *, "Traff exit,", size(array_prim), "Antall prim: ", antall_primtall
-            exit
-        else 
-            sum_up = sum_up + 1 ! Tell oppover og finn neste primtall.
+        if(primtall) then 
+           !$OMP CRITICAL
+            print *, "Kommer jeg noen gang inn på denne?"
+            call legg_til_array(array_prim, sum_up)
+            !$OMP END CRITICAL
+            !if(size(array_prim) >= antall_primtall) then 
+            !    print *, "Traff exit,", size(array_prim), "Antall prim: ", antall_primtall
+            !    call legg_til_array(array_prim, sum_up)
+            !    stop = .true.
+                !exit
+            !else 
+            !    sum_up = sum_up + 1 ! Tell oppover og finn neste primtall.
+            !end if
+            
         end if
     end do
 ! Ferdig å kalkulere primtall.
-print *, "Ferdig"
+!$OMP END PARALLEL DO
 
 !print *, "Antall primtall funnet: ", size(array_prim) 
 do i = 1, size(array_prim)
