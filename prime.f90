@@ -12,10 +12,10 @@ program primtall_kalkulator
     
     print *, "Hvor mange primtall vil du ha: "
     !read *, antall_primtall ! Lese antall primtall
-    antall_primtall = 10
-    !$OMP PARALLEL DO PRIVATE(sum_down, sum_up)
+    antall_primtall = 1000
+    !$OMP PARALLEL DO PRIVATE(sum_down, sum_up) SHARED(array_prim)
     !sum_up = 2 ! Starter på 2 og jobber oppover.
-    do sum_up = 2, 10
+    do sum_up = 2, antall_primtall
         sum_down = sum_up
         !primtall = .true.
         print *, "sum_up: ", sum_up
@@ -26,10 +26,10 @@ program primtall_kalkulator
                 exit
             else
                 print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, " er et primtall"
-                 
+                primtall = .true.
             end if
             sum_down = sum_down - 1
-            print *, "Tråd", omp_get_thread_num(), "jobber med sum_down=", sum_down
+            !print *, "Tråd", omp_get_thread_num(), "jobber med sum_down=", sum_down
         end do
         if(primtall) then 
            !$OMP CRITICAL
@@ -54,6 +54,8 @@ program primtall_kalkulator
 do i = 1, size(array_prim)
     print *, "Primtall: ", i, ":", array_prim(i)
 end do
+
+print *, "Antall primtall mellom 0-", antall_primtall, "er: ", size(array_prim) 
 
 contains
 
