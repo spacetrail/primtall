@@ -12,28 +12,34 @@ program primtall_kalkulator
     
     print *, "Hvor mange primtall vil du ha: "
     !read *, antall_primtall ! Lese antall primtall
-    antall_primtall = 1000
-    !$OMP PARALLEL DO PRIVATE(sum_down, sum_up) SHARED(array_prim)
+    antall_primtall = 10
+    !$OMP PARALLEL DO PRIVATE(sum_down, sum_up)
     !sum_up = 2 ! Starter på 2 og jobber oppover.
     do sum_up = 2, antall_primtall
         sum_down = sum_up
         !primtall = .true.
-        print *, "sum_up: ", sum_up
+        !print *, "sum_up: ", sum_up
         do while (sum_down > 1)
             if (sum_up /= sum_down .and. mod(sum_up, sum_down) == 0) then
-                print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, "ikke er et primtall"
+                !print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, "ikke er et primtall"
+                !$OMP CRITICAL
                 primtall = .false.
+                !$OMP END CRITICAL
                 exit
             else
-                print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, " er et primtall"
+                !print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, " er et primtall"
+                !$OMP CRITICAL
                 primtall = .true.
+                !$OMP END CRITICAL
             end if
+            !$OMP ATOMIC
             sum_down = sum_down - 1
+            !$OMP END ATOMIC
             !print *, "Tråd", omp_get_thread_num(), "jobber med sum_down=", sum_down
         end do
         if(primtall) then 
            !$OMP CRITICAL
-            print *, "Kommer jeg noen gang inn på denne?"
+            print *, "primtall treff:", sum_up
             call legg_til_array(array_prim, sum_up)
             !$OMP END CRITICAL
             !if(size(array_prim) >= antall_primtall) then 
