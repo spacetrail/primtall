@@ -1,0 +1,2 @@
+# primtall
+Fortran finn primtall
