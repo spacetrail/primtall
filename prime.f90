@@ -6,8 +6,9 @@ program primtall_kalkulator
     !integer :: verdi
     integer :: sum_up, sum_down, i
     integer :: antall_primtall
-    logical :: primtall = .true.
     integer, allocatable :: array_prim(:)
+    logical :: primtall = .true.
+    real :: start_tid, stopp_tid, brukt_tid
     
     allocate(array_prim(0));
 
@@ -21,6 +22,10 @@ program primtall_kalkulator
     print *, "Hvor mange primtall vil du ha: "
     read *, antall_primtall ! Lese antall primtall
     !antall_primtall = 1000
+
+    ! Ta tiden
+    call CPU_TIME(start_tid)
+
     !$OMP PARALLEL DO PRIVATE(sum_down, sum_up, primtall) SHARED(antall_primtall)
     !sum_up = 2 ! Starter på 2 og jobber oppover.
     do sum_up = 2, antall_primtall
@@ -63,6 +68,10 @@ program primtall_kalkulator
     end do
 ! Ferdig å kalkulere primtall.
 !$OMP END PARALLEL DO
+
+call CPU_TIME(stopp_tid)
+brukt_tid = stopp_tid - start_tid
+print '("tid : ",f6.3," sekunder.")',stopp_tid-start_tid
 
 call sort_array(array_prim, size(array_prim))
 
