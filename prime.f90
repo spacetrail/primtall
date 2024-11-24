@@ -8,7 +8,7 @@ program primtall_kalkulator
     integer :: antall_primtall
     integer, allocatable :: array_prim(:)
     logical :: primtall = .true.
-    real :: start_tid, stopp_tid, brukt_tid
+    real :: start_tid, stopp_tid
     
     allocate(array_prim(0));
 
@@ -70,8 +70,7 @@ program primtall_kalkulator
 !$OMP END PARALLEL DO
 
 call CPU_TIME(stopp_tid)
-brukt_tid = stopp_tid - start_tid
-print '("tid : ",f6.3," sekunder.")',stopp_tid-start_tid
+
 
 call sort_array(array_prim, size(array_prim))
 
@@ -81,7 +80,7 @@ do i = 1, size(array_prim)
 end do
 
 print *, "Antall primtall mellom 0-", antall_primtall, "er: ", size(array_prim) 
-
+print '("kalkuleringstid : ",f6.3," sekunder.")',stopp_tid-start_tid
 contains
 ! Sortere array fra 0-x
 subroutine sort_array(array, size)
