@@ -19,9 +19,9 @@ program primtall_kalkulator
     ! mellom 2 og antall_primtall
 
     print *, "Hvor mange primtall vil du ha: "
-    !read *, antall_primtall ! Lese antall primtall
-    antall_primtall = 100
-    !$OMP PARALLEL DO PRIVATE(sum_down, sum_up) SHARED(antall_primtall)
+    read *, antall_primtall ! Lese antall primtall
+    !antall_primtall = 1000
+    !$OMP PARALLEL DO PRIVATE(sum_down, sum_up, primtall) SHARED(antall_primtall)
     !sum_up = 2 ! Starter på 2 og jobber oppover.
     do sum_up = 2, antall_primtall
         sum_down = sum_up
