@@ -4,7 +4,7 @@ program primtall_kalkulator
     integer :: sum_up, sum_down, i ! Intern logikk for løkkene
     integer :: antall_primtall ! Hvor mange primtall skal letes etter 
     integer, allocatable :: array_prim(:) ! Array med alle primtall
-    logical :: primtall = .true. ! Flag om primtall funnet
+    logical :: primtall = .true. ! Flag om primtall funnet - OBS, det kan være feil logikk av denne
     real :: start_tid, stopp_tid ! Klokke
     
     allocate(array_prim(0)); ! Initialisering av slutt array
@@ -26,16 +26,18 @@ program primtall_kalkulator
         !primtall = .true.
         !print *, "sum_up: ", sum_up
         do while (sum_down > 1)
+            ! Hvis tallet kan deles og får et integer tilbake, er det ikke prim.
             if (sum_up /= sum_down .and. mod(sum_up, sum_down) == 0) then
                 !print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, "ikke er et primtall"
                 !$OMP CRITICAL
-                primtall = .false.
+                primtall = .false. ! Kan være noe feil med denne
                 !$OMP END CRITICAL
                 exit
             else
                 !print *, "Tråd", omp_get_thread_num(), " fant ut at", sum_up, " ", sum_down, " er et primtall"
                 !$OMP CRITICAL
-                primtall = .true.
+                primtall = .true. ! Ikke helt sikker om denne stemmer. 
+                ! Kan hende initialiseringen av primtall som true redder den.
                 !$OMP END CRITICAL
             end if
             !$OMP ATOMIC
