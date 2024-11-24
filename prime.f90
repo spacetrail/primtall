@@ -1,23 +1,16 @@
 program primtall_kalkulator
     use omp_lib !OpenMP bibliotek
     implicit none
-    !logical :: stop = .false.
-    !real :: rest 
-    !integer :: verdi
-    integer :: sum_up, sum_down, i
-    integer :: antall_primtall
-    integer, allocatable :: array_prim(:)
-    logical :: primtall = .true.
-    real :: start_tid, stopp_tid
+    integer :: sum_up, sum_down, i ! Intern logikk for løkkene
+    integer :: antall_primtall ! Hvor mange primtall skal letes etter 
+    integer, allocatable :: array_prim(:) ! Array med alle primtall
+    logical :: primtall = .true. ! Flag om primtall funnet
+    real :: start_tid, stopp_tid ! Klokke
     
-    allocate(array_prim(0));
+    allocate(array_prim(0)); ! Initialisering av slutt array
 
-    ! Logisk feil en plass
-    ! Den rapporterte 4 som primtall
-    ! så på en måte må primtall flagget være gyldig under bestemte
-    ! omstendigheter. Skal se på det i morgen.
-    ! Samtidig, den skal finne x antall primtall, ikke primtall
-    ! mellom 2 og antall_primtall
+    ! Den skal finne x antall primtall, ikke primtall
+    ! mellom 2 og antall_primtall. Problem med multicore direktiv.
 
     print *, "Hvor mange primtall vil du ha: "
     read *, antall_primtall ! Lese antall primtall
