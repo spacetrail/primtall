@@ -4,7 +4,7 @@ program primtall_kalkulator
     integer :: antall_primtall ! Hvor mange primtall skal letes etter 
     integer, allocatable :: array_prim(:) ! Array med alle primtall
     logical :: primtall = .true. ! Flag om primtall funnet - OBS, det kan være feil logikk av denne
-    real :: start_tid, stopp_tid ! Klokke
+    real(8) :: start_tid, stopp_tid ! Klokke
     logical :: run = .true.
 
     allocate(array_prim(0)); ! Initialisering av slutt array
@@ -14,7 +14,7 @@ program primtall_kalkulator
 
     !print *, "Hvor mange primtall vil du ha: "
     ! read *, antall_primtall ! Lese antall primtall
-    antall_primtall = 100000
+    antall_primtall = 1000000
     call legg_til_array(array_prim, 2)
     ! Ta tiden
     call CPU_TIME(start_tid)
@@ -25,22 +25,27 @@ program primtall_kalkulator
         primtall = .true.
         ! Forsøk på å få den til å bruke flere kjerner, ser ut til å feile.
         ! Men den fungerer bedre enn første forsøk ettersom den finner antall prim, ikke mellom 3 og x.
-        multi: do concurrent (i = 2:sum_up-1)
-        ! Hvis tallet kan deles og får et integer tilbake, er det ikke prim.
-            if (mod(sum_up, i) == 0) then
-                primtall = .false.
-            end if
-        end do multi
+        if(mod(sum_down, 2) == 0 .and. sum_down > 2) primtall = .false.
         if(primtall) then 
-            !print *, "primtall treff:", sum_up
-            call legg_til_array(array_prim, sum_up)
-            
-            if(size(array_prim) >= antall_primtall) then 
-                run = .false.
+            multi: do i = 3, int(sqrt(real(sum_down)))
+                ! Hvis tallet kan deles og får et integer tilbake, er det ikke prim.
+                    if (mod(sum_up, i) == 0) then
+                        primtall = .false.
+                        exit
+                    end if
+                end do multi
             end if
-        end if
-        sum_up = sum_up + 2 ! Tell oppover og finn neste primtall.
-    end do
+                if(primtall) then 
+                    !print *, "primtall treff:", sum_up
+                    call legg_til_array(array_prim, sum_up)
+                    
+                    if(size(array_prim) >= antall_primtall) then 
+                        run = .false.
+                    end if
+                end if
+                sum_up = sum_up + 2 ! Tell oppover og finn neste primtall.
+            end do
+        
 ! Ferdig å kalkulere primtall.
 
 call CPU_TIME(stopp_tid)
@@ -54,7 +59,7 @@ do i = 1, size(array_prim)
 end do
 
 print *, "Antall primtall: ", size(array_prim) 
-print '("kalkuleringstid : ",f6.3," sekunder.")',stopp_tid-start_tid
+print '("kalkuleringstid : ",f15.6," sekunder.")',stopp_tid-start_tid
 contains
 ! Sortere array fra 0-x
 subroutine sort_array(array, size)
