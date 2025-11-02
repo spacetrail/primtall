@@ -12,9 +12,9 @@ program primtall_kalkulator
     ! Den skal finne x antall primtall, ikke primtall
     ! mellom 2 og antall_primtall. Problem med multicore direktiv.
 
-    !print *, "Hvor mange primtall vil du ha: "
-    ! read *, antall_primtall ! Lese antall primtall
-    antall_primtall = 1000000
+    write(*, '(A)', advance='no') "Hvor mange primtall vil du ha: "
+    read *, antall_primtall ! Lese antall primtall
+    ! antall_primtall = 1000000 ! debug
     call legg_til_array(array_prim, 2)
     ! Ta tiden
     call CPU_TIME(start_tid)
@@ -59,7 +59,14 @@ do i = 1, size(array_prim)
 end do
 
 print *, "Antall primtall: ", size(array_prim) 
-print '("kalkuleringstid : ",f15.6," sekunder.")',stopp_tid-start_tid
+if (stopp_tid-start_tid < 60.0) then
+    print '("Kalkuleringstid : ",f15.6," sekunder.")',stopp_tid-start_tid
+else if (stopp_tid-start_tid < 3600.0) then
+    print '("Kalkuleringstid : ",f15.6," minutter.")',(stopp_tid-start_tid)/60.0
+else
+    print '("Kalkuleringstid : ",f15.6," timer.")',(stopp_tid-start_tid)/3600.0
+end if
+
 contains
 ! Sortere array fra 0-x
 subroutine sort_array(array, size)
