@@ -2,6 +2,7 @@ program primtall_kalkulator
     implicit none
     integer :: sum_up, sum_down, i ! Intern logikk for løkkene
     integer :: antall_primtall ! Hvor mange primtall skal letes etter 
+    integer :: timer, minutter, sekunder ! Tid i minutter
     integer, allocatable :: array_prim(:) ! Array med alle primtall
     logical :: primtall = .true. ! Flag om primtall funnet - OBS, det kan være feil logikk av denne
     real(8) :: start_tid, stopp_tid ! Klokke
@@ -62,10 +63,17 @@ print *, "Antall primtall: ", size(array_prim)
 if (stopp_tid-start_tid < 60.0) then
     print '("Kalkuleringstid : ",f15.6," sekunder.")',stopp_tid-start_tid
 else if (stopp_tid-start_tid < 3600.0) then
-    print '("Kalkuleringstid : ",f15.6," minutter.")',(stopp_tid-start_tid)/60.0
+    minutter = int((stopp_tid-start_tid)/60.0)
+    sekunder = int(mod(stopp_tid-start_tid, 60.0))
+    print *, "Kalkuleringstid : ",minutter," minutter og ",sekunder," sekunder."
 else
-    print '("Kalkuleringstid : ",f15.6," timer.")',(stopp_tid-start_tid)/3600.0
+    timer = int((stopp_tid-start_tid)/3600.0)
+    minutter = int(mod((stopp_tid-start_tid)/60.0, 60.0))
+    sekunder = int(mod(stopp_tid-start_tid, 60.0))
+    print *, "Kalkuleringstid : ",timer," timer, ",minutter," minutter og ",sekunder," sekunder."
 end if
+
+call cpu_info()
 
 contains
 ! Sortere array fra 0-x
@@ -102,5 +110,10 @@ subroutine sort_array(array, size)
     temp(size(array) + 1) = verdi
     call move_alloc(temp, array)
   end subroutine legg_til_array
+
+  subroutine cpu_info()
+    implicit none
+    call execute_command_line('grep "model name" /proc/cpuinfo | head -1')
+  end subroutine cpu_info
 
 end program primtall_kalkulator
